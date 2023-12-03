@@ -5,8 +5,6 @@ import requests
 from datetime import datetime
 from configparser import ParsingError
 from config import config
-import time
-import pprint
 
 path_vacancies = './vacancies.json'
 
