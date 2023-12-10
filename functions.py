@@ -5,6 +5,7 @@ import requests
 from datetime import datetime
 from configparser import ParsingError
 from config import config
+from main import main
 
 path_vacancies = './vacancies.json'
 
@@ -194,24 +195,23 @@ class DBManager:
 
             with self.conn:
                 with self.conn.cursor() as cur:
-                    with open(path, 'r', encoding='UTF-8') as file:
-                        reader = json.DictReader(file)
-                        for i in reader:
-                            employee_id = i['employee_id'],
-                            employee_name = i['employee_name'],
-                            publish_date = i['date'],
-                            area = i['area']
-                            cur.execute("INSERT INTO employee VALUES (%s, %s, %s, %s)", (
-                                employee_id,
-                                employee_name,
-                                publish_date,
-                                area
-                            ))
-                            cur.execute("SELECT * FROM employee")
+                    reader = main()
+                    for i in reader:
+                        employee_id = i['employee_id'],
+                        employee_name = i['employee_name'],
+                        publish_date = i['date'],
+                        area = i['area']
+                        cur.execute("INSERT INTO employee VALUES (%s, %s, %s, %s)", (
+                            employee_id,
+                            employee_name,
+                            publish_date,
+                            area
+                        ))
+                        cur.execute("SELECT * FROM employee")
 
-                            datas = cur.fetchall()
-                            for data in datas:
-                                print(data)
+                        datas = cur.fetchall()
+                        for data in datas:
+                            print(data)
 
         finally:
             self.conn.close()
@@ -221,96 +221,100 @@ class DBManager:
 
             with self.conn:
                 with self.conn.cursor() as cur:
-                    with open(path, 'r', encoding='UTF-8') as file:
-                        reader = json.DictReader(file)
-                        for i in reader:
-                            vacancies_id = i['vacancies_id']
-                            employee_id = i['employee_id'],
-                            vacancies_name = i['title'],
-                            salary_from = i['salary_from'],
-                            salary_to = i['salary_to'],
-                            currency = i['currency'],
-                            requirements = i['requirements'],
-                            url = f"https://hh.ru/vacancy/{i['items'][0]['id']}",
-                            cur.execute("INSERT INTO vacancies VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (
-                                vacancies_id,
-                                employee_id,
-                                vacancies_name,
-                                salary_from,
-                                salary_to,
-                                currency,
-                                requirements,
-                                url,
-                            ))
-                            cur.execute("SELECT * FROM vacancies")
+                    reader = main()
+                    for i in reader:
+                        vacancies_id = i['vacancies_id']
+                        employee_id = i['employee_id'],
+                        vacancies_name = i['title'],
+                        salary_from = i['salary_from'],
+                        salary_to = i['salary_to'],
+                        currency = i['currency'],
+                        requirements = i['requirements'],
+                        url = f"https://hh.ru/vacancy/{i['items'][0]['id']}",
+                        cur.execute("INSERT INTO vacancies VALUES (%s, %s, %s, %s, %s, %s, %s, %s)", (
+                            vacancies_id,
+                            employee_id,
+                            vacancies_name,
+                            salary_from,
+                            salary_to,
+                            currency,
+                            requirements,
+                            url,
+                        ))
+                        cur.execute("SELECT * FROM vacancies")
 
-                            datas = cur.fetchall()
-                            for data in datas:
-                                print(data)
+                        datas = cur.fetchall()
+                        for data in datas:
+                            print(data)
 
         finally:
             self.conn.commit()
             self.conn.close()
 
-    def get_companies_and_vacancies_count(self):
-        # получает список всех компаний и количество вакансий у каждой компании
-        with self.conn:
-            self.cur.execute(
-                "SELECT DISTINCT employee.employee_name, COUNT(vacancies.vacancies_name) AS count_vacancies"
-                "FROM employee"
-                "JOIN vacancies USING(employee_id)"
-                "GROUP BY employee.employee_name"
-                "ORDER BY count_vacancies;"
-            )
-        data = self.cur.fetchall()
-        return data
 
-        self.conn.commit()
-        self.conn.close()
+def get_companies_and_vacancies_count(self):
+    # получает список всех компаний и количество вакансий у каждой компании
+    with self.conn:
+        self.cur.execute(
+            "SELECT DISTINCT employee.employee_name, COUNT(vacancies.vacancies_name) AS count_vacancies"
+            "FROM employee"
+            "JOIN vacancies USING(employee_id)"
+            "GROUP BY employee.employee_name"
+            "ORDER BY count_vacancies;"
+        )
+    data = self.cur.fetchall()
+    return data
 
-    def get_all_vacancies(self):
-        # получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию
-        with self.conn:
-            self.cur.execute(
-                "SELECT employee_name, name, salary_from, salary_to, url"
-                "FROM vacancies"
-                "JOIN employee USING(employee_id)"
-                "ORDER BY employee_name, name, salary_from, salary_to, url"
-            )
-        data = self.cur.fetchall()
-        return data
+    self.conn.commit()
+    self.conn.close()
 
-    def get_avg_salary(self):
-        # получает среднюю зарплату по вакансиям
-        with self.conn:
-            self.cur.execute(
-                "SELECT name, AVG(salary_from, salary_to) AS avg_salary"
-                "FROM vacancies "
-                "GROUP BY name"
-                "ORDER BY avg_salary;"
-            )
-        data = self.cur.fetchall()
-        return data
 
-    def get_vacancies_with_higher_salary(self):
-        # получает список всех вакансий, у которых зарплата выше средней по всем вакансиям
-        with self.conn:
-            self.cur.execute(
-                "SELECT name, AVG(salary_from, salary_to) AS avg_salary"
-                "FROM vacancies "
-                "GROUP BY name"
-                "ORDER BY avg_salary;"
-            )
-        data = self.cur.fetchall()
-        return data
+def get_all_vacancies(self):
+    # получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию
+    with self.conn:
+        self.cur.execute(
+            "SELECT employee_name, name, salary_from, salary_to, url"
+            "FROM vacancies"
+            "JOIN employee USING(employee_id)"
+            "ORDER BY employee_name, name, salary_from, salary_to, url"
+        )
+    data = self.cur.fetchall()
+    return data
 
-    def get_vacancies_with_keyword(self):
-        # получает список всех вакансий, в названии которых содержатся переданные в метод слова, например python
-        with self.conn:
-            self.cur.execute(
-                "SELECT name FROM vacancies"
-                "WHERE name LIKE '%python%'"
-                "ORDER BY name;"
-            )
-        data = self.cur.fetchall()
-        return data
+
+def get_avg_salary(self):
+    # получает среднюю зарплату по вакансиям
+    with self.conn:
+        self.cur.execute(
+            "SELECT name, AVG(salary_from, salary_to) AS avg_salary"
+            "FROM vacancies "
+            "GROUP BY name"
+            "ORDER BY avg_salary;"
+        )
+    data = self.cur.fetchall()
+    return data
+
+
+def get_vacancies_with_higher_salary(self):
+    # получает список всех вакансий, у которых зарплата выше средней по всем вакансиям
+    with self.conn:
+        self.cur.execute(
+            "SELECT name, AVG(salary_from, salary_to) AS avg_salary"
+            "FROM vacancies "
+            "GROUP BY name"
+            "ORDER BY avg_salary;"
+        )
+    data = self.cur.fetchall()
+    return data
+
+
+def get_vacancies_with_keyword(self):
+    # получает список всех вакансий, в названии которых содержатся переданные в метод слова, например python
+    with self.conn:
+        self.cur.execute(
+            "SELECT name FROM vacancies"
+            "WHERE name LIKE '%python%'"
+            "ORDER BY name;"
+        )
+    data = self.cur.fetchall()
+    return data
