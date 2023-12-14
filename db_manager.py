@@ -22,21 +22,21 @@ class DBManager:
         # создание таблицы по компаниям
         with self.conn.cursor() as cur:
             cur.execute("""
-            "CREATE TABLE employee,"
-            "(employee_id INT PRIMARY KEY NOT NULL,"
-            "employee_name VARCHAR(255) NOT NULL)"
+            CREATE TABLE employee
+            (employee_id INT PRIMARY KEY NOT NULL,
+            employee_name VARCHAR(255) NOT NULL)
         """)
 
     def create_table_vacancies(self):
         # создание таблицы по вакансиям
         with self.conn.cursor() as cur:
             cur.execute("""
-                  "CREATE TABLE vacancies,"
-                  "(vacancies_id INT PRIMARY KEY NOT NULL,"
-                  "employee_id INT NOT NULL REFERENCES employee(employee_id),"
-                  "vacancies_name VARCHAR(255) NOT NULL,"
-                  "salary_from INT,"
-                  "url TEXT)"
+                  CREATE TABLE vacancies
+                  (vacancies_id INT PRIMARY KEY NOT NULL,
+                  employee_id INT NOT NULL REFERENCES employee(employee_id),
+                  vacancies_name VARCHAR(255) NOT NULL,
+                  salary_from INT,
+                  url TEXT)
             """)
         self.conn.commit()
 
@@ -88,25 +88,26 @@ class DBManager:
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute("""
-                    "SELECT DISTINCT employee.employee_name, COUNT(vacancies.vacancies_name) AS count_vacancies,"
-                    "FROM employee,"
-                    "JOIN vacancies USING(employee_id),"
-                    "GROUP BY employee.employee_name,"
-                    "ORDER BY count_vacancies,"
-                     """)
+                    SELECT DISTINCT employee.employee_name, COUNT(vacancies.vacancies_name) AS count_vacancies
+                    FROM employee
+                    JOIN vacancies USING(employee_id)
+                    GROUP BY employee.employee_name
+                    ORDER BY count_vacancies
+                """)
 
             data = self.cur.fetchall()
             return data
+
 
     def get_all_vacancies(self):
         # получает список всех вакансий с указанием названия компании, названия вакансии и зарплаты и ссылки на вакансию
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute("""
-                    "SELECT employee_name, salary_from, url,"
-                    "FROM vacancies,"
-                    "JOIN employee USING(employee_id),"
-                    "ORDER BY employee_name, salary_from, url"
+                    SELECT employee_name, salary_from, url
+                    FROM vacancies
+                    JOIN employee USING(employee_id)
+                    ORDER BY employee_name, salary_from, url
                 """)
             data = self.cur.fetchall()
             return data
@@ -116,10 +117,10 @@ class DBManager:
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute("""
-                    "SELECT vacancies_name, ROUND(AVG(salary_from),2) AS avg_salary,"
-                    "FROM vacancies,
-                    "GROUP BY vacancies_name,"
-                    "ORDER BY avg_salary"
+                    SELECT vacancies_name, ROUND(AVG(salary_from),2) AS avg_salary
+                    FROM vacancies
+                    GROUP BY vacancies_name
+                    ORDER BY avg_salary
                 """)
             data = self.cur.fetchall()
             return data
@@ -129,11 +130,11 @@ class DBManager:
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute("""
-                    "SELECT vacancies_name, ROUND(AVG(salary_from),2),"
-                    "FROM vacancies,"
-                    "GROUP BY vacancies_name, salary_from,"
-                    "HAVING salary_from > ROUND(AVG(salary_from),2),"
-                    "ORDER BY vacancies_name"
+                    SELECT vacancies_name, ROUND(AVG(salary_from),2)
+                    FROM vacancies
+                    GROUP BY vacancies_name, salary_from
+                    HAVING salary_from > ROUND(AVG(salary_from),2)
+                    ORDER BY vacancies_name
                 """)
             data = self.cur.fetchall()
             return data
@@ -143,9 +144,9 @@ class DBManager:
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute("""
-                    "SELECT vacancies_name FROM vacancies,"
-                    "WHERE vacancies_name LIKE '%SQL%',"
-                    "ORDER BY vacancies_name"
+                    SELECT vacancies_name FROM vacancies
+                    WHERE vacancies_name LIKE '%SQL%'
+                    ORDER BY vacancies_name
                 """)
             data = self.cur.fetchall()
             return data
