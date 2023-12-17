@@ -46,7 +46,7 @@ def main():
 
         for vacancy in vacancies:
             print(vacancy, end='\n')
-            manager.conn.close()
+    manager.conn.close()
 
 
 

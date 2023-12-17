@@ -105,7 +105,7 @@ class DBManager:
         with self.conn:
             with self.conn.cursor() as cur:
                 cur.execute("""
-                    SELECT employee_name, salary_from, url
+                    SELECT employee_name, vacancies_name, salary_from, url
                     FROM vacancies
                     JOIN employee USING(employee_id)
                     ORDER BY employee_name, salary_from, url
