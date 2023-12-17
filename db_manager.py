@@ -96,8 +96,8 @@ class DBManager:
                     ORDER BY count_vacancies
                 """)
 
-            data = self.cur.fetchall()
-            return data
+                data = cur.fetchall()
+                return data
 
 
     def get_all_vacancies(self):
@@ -110,8 +110,8 @@ class DBManager:
                     JOIN employee USING(employee_id)
                     ORDER BY employee_name, salary_from, url
                 """)
-            data = self.cur.fetchall()
-            return data
+                data = cur.fetchall()
+                return data
 
     def get_avg_salary(self):
         # получает среднюю зарплату по вакансиям
@@ -123,8 +123,8 @@ class DBManager:
                     GROUP BY vacancies_name
                     ORDER BY avg_salary
                 """)
-            data = self.cur.fetchall()
-            return data
+                data = cur.fetchall()
+                return data
 
     def get_vacancies_with_higher_salary(self):
         # получает список всех вакансий, у которых зарплата выше средней по всем вакансиям
@@ -137,8 +137,8 @@ class DBManager:
                     HAVING salary_from > ROUND(AVG(salary_from),2)
                     ORDER BY vacancies_name
                 """)
-            data = self.cur.fetchall()
-            return data
+                data = cur.fetchall()
+                return data
 
     def get_vacancies_with_keyword(self):
         # получает список всех вакансий, в названии которых содержатся переданные в метод слова, например SQL
@@ -149,5 +149,5 @@ class DBManager:
                     WHERE vacancies_name LIKE '%SQL%'
                     ORDER BY vacancies_name
                 """)
-            data = self.cur.fetchall()
-            return data
+                data = cur.fetchall()
+                return data
