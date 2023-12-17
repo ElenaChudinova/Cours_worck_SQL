@@ -56,9 +56,10 @@ class DBManager:
                     ))
                     cur.execute("SELECT * FROM employee")
 
-                    datas = cur.fetchall()
-                    for data in datas:
-                        print(data)
+                datas = cur.fetchall()
+                for data in datas:
+                    print(data)
+
 
     def save_database_vacancies(self, vacancies):
         # запись информации о вакансиях в базу данных
@@ -79,9 +80,9 @@ class DBManager:
                     ))
                     cur.execute("SELECT * FROM vacancies")
 
-                    datas = cur.fetchall()
-                    for data in datas:
-                        print(data)
+                datas = cur.fetchall()
+                for data in datas:
+                    print(data)
 
     def get_companies_and_vacancies_count(self):
         # получает список всех компаний и количество вакансий у каждой компании
